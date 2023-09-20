@@ -24,7 +24,7 @@ export const createDocs = async ({
       allMdx(
         filter: {
           fileAbsolutePath: { regex: "/^(?!.*TOC).*$/" }
-          slug: { nin: ["en/tidb/_docHome", "zh/tidb/_docHome"] }
+          fields: { slug: { nin: ["en/tidb/_docHome", "zh/tidb/_docHome"] } }
           frontmatter: { draft: { ne: true } }
         }
       ) {
@@ -33,11 +33,16 @@ export const createDocs = async ({
           frontmatter {
             aliases
           }
-          slug
+          fields {
+            slug
+          }
           parent {
             ... on File {
               relativePath
             }
+          }
+          internal {
+            contentFilePath
           }
         }
       }
@@ -49,7 +54,7 @@ export const createDocs = async ({
   }
 
   const nodes = docs.data!.allMdx.nodes.map((node) => {
-    const { config, name, filePath } = generateConfig(node.slug);
+    const { config, name, filePath } = generateConfig(node.fields.slug);
     return { ...node, pathConfig: config, name, filePath };
   });
 
@@ -75,7 +80,7 @@ export const createDocs = async ({
   );
 
   nodes.forEach((node) => {
-    const { id, name, pathConfig, filePath } = node;
+    const { id, name, pathConfig, filePath, internal } = node;
 
     if (name?.startsWith("_")) {
       return;
@@ -94,7 +99,7 @@ export const createDocs = async ({
 
     createPage({
       path,
-      component: template,
+      component: `${template}?__contentFilePath=${internal.contentFilePath}`,
       context: {
         id,
         name,
@@ -160,7 +165,12 @@ interface PageQueryData {
     nodes: {
       id: string;
       frontmatter: { aliases: string[] };
-      slug: string;
+      fields: {
+        slug: string;
+      };
+      internal: {
+        contentFilePath: string;
+      };
     }[];
   };
 }
@@ -185,7 +195,9 @@ export const createDocHome = async ({
         frontmatter {
           aliases
         }
-        slug
+        fields {
+          slug
+        }
         parent {
           ... on File {
             relativePath
@@ -209,7 +221,9 @@ export const createDocHome = async ({
         frontmatter {
           aliases
         }
-        slug
+        fields {
+          slug
+        }
         parent {
           ... on File {
             relativePath
@@ -231,12 +245,12 @@ export const createDocHome = async ({
   }
 
   const nodes = docs.data!.allMdx.nodes.map((node) => {
-    const { config, name, filePath } = generateConfig(node.slug);
+    const { config, name, filePath } = generateConfig(node.fields.slug);
     return { ...node, pathConfig: config, name, filePath };
   });
 
   nodes.forEach((node) => {
-    const { id, name, pathConfig, filePath, slug } = node;
+    const { id, name, pathConfig, filePath } = node;
     const path = generateDocHomeUrl(name, pathConfig);
     const navUrl = generateNav(pathConfig);
 

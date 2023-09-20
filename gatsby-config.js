@@ -97,8 +97,10 @@ module.exports = {
         extensions: [`.mdx`, `.md`],
         // https://github.com/gatsbyjs/gatsby/issues/21866#issuecomment-1063668178
         // Add katex support
-        remarkPlugins: [require("remark-math")],
-        rehypePlugins: [[require("rehype-katex"), { strict: "ignore" }]],
+        mdxOptions: {
+          remarkPlugins: [require(`remark-gfm`), require("remark-math")],
+          rehypePlugins: [[require("rehype-katex"), { strict: "ignore" }]],
+        },
         gatsbyRemarkPlugins: [
           {
             resolve: `gatsby-remark-autolink-headers`,

@@ -36,22 +36,23 @@ interface DocTemplateProps {
     };
     mdx: {
       frontmatter: FrontMatter;
-      body: string;
       tableOfContents: TableOfContent;
     };
     navigation?: {
       navigation: RepoNav;
     };
   };
+  children: React.ReactNode;
 }
 
 export default function DocTemplate({
   pageContext: { name, availIn, pathConfig, filePath, pageUrl, buildType },
   data,
+  children,
 }: DocTemplateProps) {
   const {
     site,
-    mdx: { frontmatter, tableOfContents, body },
+    mdx: { frontmatter, tableOfContents },
     navigation: originNav,
   } = data;
 
@@ -178,7 +179,6 @@ export default function DocTemplate({
                     }}
                   >
                     <MDXContent
-                      data={body}
                       className={clsx("doc-content")}
                       name={name}
                       pathConfig={pathConfig}
@@ -187,7 +187,9 @@ export default function DocTemplate({
                       availIn={availIn.version}
                       language={language}
                       buildType={buildType}
-                    />
+                    >
+                      {children}
+                    </MDXContent>
                     {!frontmatter?.hide_commit && buildType !== "archive" && (
                       <GitCommitInfoCard
                         pathConfig={pathConfig}
@@ -282,7 +284,6 @@ export const query = graphql`
         hide_commit
         hide_leftNav
       }
-      body
       tableOfContents
     }
 

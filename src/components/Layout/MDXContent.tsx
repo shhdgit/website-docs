@@ -2,7 +2,6 @@ import * as React from "react";
 import { graphql, Link } from "gatsby";
 
 import { MDXProvider } from "@mdx-js/react";
-import { MDXRenderer } from "gatsby-plugin-mdx";
 
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -19,7 +18,7 @@ import replaceInternalHref from "utils/anchor";
 import { Pre } from "components/MDXComponents/Pre";
 
 export default function MDXContent(props: {
-  data: any;
+  children: React.ReactNode;
   className?: string;
   name: string;
   pathConfig: PathConfig;
@@ -30,7 +29,7 @@ export default function MDXContent(props: {
   buildType: BuildType;
 }) {
   const {
-    data,
+    children,
     className,
     name,
     pathConfig,
@@ -81,7 +80,7 @@ export default function MDXContent(props: {
             pre: Pre,
           }}
         >
-          <MDXRenderer>{data}</MDXRenderer>
+          {children}
         </MDXProvider>
       </Box>
     </Container>
